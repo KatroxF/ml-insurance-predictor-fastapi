@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insurance Risk Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="predict.css">
+</head>
+<body>
+
+```
+<button id="logout-btn">Logout</button>
+<div class="container">
+
+    <div class="header">
+        <h1>Insurance Risk Predictor</h1>
+        <p>
+            Predict insurance charges based on health and lifestyle factors.
+            Powered by a trained ML model with FastAPI backend.
+        </p>
+        
+    </div>
+    
+
+    <div class="card">
+
+        <form class="form-grid">
+
+            <!-- Age -->
+            <div class="input-group">
+                <label>Age</label>
+                <input id="age" type="number" placeholder="Enter age">
+                <span id="age_error" class="error"></span>
+            </div>
+
+            <!-- BMI -->
+            <div class="input-group">
+                <label>BMI</label>
+                <input id="bmi" type="number" placeholder="Enter BMI">
+                <span id="bmi_error" class="error"></span>
+            </div>
+
+            <!-- Children -->
+            <div class="input-group">
+                <label>Children</label>
+                <input id="children" type="number" placeholder="Number of children">
+                <span id="children_error" class="error"></span>
+            </div>
+
+            <!-- Smoker -->
+            <div class="input-group">
+                <label>Smoker</label>
+                <select id="smoke">
+                    <option value="" disabled selected>Select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <span id="smoke_error" class="error"></span>
+            </div>
+
+            <!-- Button -->
+            <div class="full-width">
+                <button id="submit" type="button">Generate Prediction</button>
+            </div>
+
+            <!-- Result + Explanation -->
+            <div class="full-width">
+                <div id="result" class="result"></div>
+                <div id="explanation" class="result"></div>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+```
+
+<script type="module" src="predict.js"></script>
+
+</body>
+</html>

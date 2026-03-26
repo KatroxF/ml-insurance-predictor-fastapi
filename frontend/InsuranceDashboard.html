@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InsureML Dashboard</title>
+  <link rel="stylesheet" href="dashboardd.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <span class="brand-name">InsureML</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Overview</span>
+      </a>
+      <a href="#" class="nav-item" data-section="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span>Registered Users</span>
+      </a>
+      <a href="#" class="nav-item" data-section="predictions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span>Prediction History</span>
+      </a>
+      <a href="#" class="nav-item" data-section="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span>Analytics</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="api-status">
+        <span class="status-dot"></span>
+        <span>API Connected</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="page-title" id="pageTitle">Overview</div>
+      </div>
+      <div class="topbar-right">
+        <div class="date-badge" id="currentDate"></div>
+        <div class="avatar">AD</div>
+      </div>
+    </header>
+
+    <!-- OVERVIEW SECTION -->
+    <section class="section active" id="section-overview">
+      <div class="section-header">
+        <h2>Dashboard Overview</h2>
+        <p>Insurance ML model performance & user activity</p>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stat-grid">
+        <div class="stat-card" id="statTotalUsers">
+          <div class="stat-icon users-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number" id="totalUsersNum">0</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+          <div class="stat-trend up">+12%</div>
+        </div>
+
+        <div class="stat-card" id="statTotalPredictions">
+          <div class="stat-icon predict-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number" id="totalPredictionsNum">0</div>
+            <div class="stat-label">Total Predictions</div>
+          </div>
+          <div class="stat-trend up">+28%</div>
+        </div>
+
+        <div class="stat-card" id="statAvgPrediction">
+          <div class="stat-icon avg-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number" id="avgPredictionNum">$0</div>
+            <div class="stat-label">Avg Prediction</div>
+          </div>
+          <div class="stat-trend down">-3%</div>
+        </div>
+
+        <div class="stat-card" id="statSmokers">
+          <div class="stat-icon smoker-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number" id="smokerNum">0%</div>
+            <div class="stat-label">Smoker Rate</div>
+          </div>
+          <div class="stat-trend up">+5%</div>
+        </div>
+      </div>
+
+      <!-- MINI CHART ON OVERVIEW -->
+      <div class="overview-chart-card">
+        <div class="card-header">
+          <div>
+            <h3>Prediction Trend</h3>
+            <p>Cost predictions over recent entries</p>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot teal"></span><span>Insurance Cost</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="overviewChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTERED USERS SECTION -->
+    <section class="section" id="section-users">
+      <div class="section-header">
+        <h2>Registered Users</h2>
+        <p>All users registered to the insurance API</p>
+      </div>
+
+      <div class="table-card">
+        <div class="table-controls">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="userSearch" placeholder="Search by username or email..." />
+          </div>
+          <div class="filter-group">
+            <select id="userDateFilter">
+              <option value="all">All Dates</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+            </select>
+            <select id="userPageSize">
+              <option value="10">10 / page</option>
+              <option value="15">15 / page</option>
+              <option value="20">20 / page</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="usersTable">
+            <thead>
+              <tr>
+                <th data-sort="id" class="sortable">ID <span class="sort-icon">↕</span></th>
+                <th data-sort="username" class="sortable">Username <span class="sort-icon">↕</span></th>
+                <th data-sort="email" class="sortable">Email <span class="sort-icon">↕</span></th>
+                <th data-sort="created_at" class="sortable">Created At <span class="sort-icon">↕</span></th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- filled by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar" id="usersPagination"></div>
+      </div>
+    </section>
+
+    <!-- PREDICTION HISTORY SECTION -->
+    <section class="section" id="section-predictions">
+      <div class="section-header">
+        <h2>Prediction History</h2>
+        <p>All insurance cost predictions made via the API</p>
+      </div>
+
+      <div class="table-card">
+        <div class="table-controls">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="predSearch" placeholder="Search by User ID or smoker status..." />
+          </div>
+          <div class="filter-group">
+            <select id="smokerFilter">
+              <option value="all">All</option>
+              <option value="yes">Smoker</option>
+              <option value="no">Non-Smoker</option>
+            </select>
+            <select id="predAgeFilter">
+              <option value="all">All Ages</option>
+              <option value="18-30">18–30</option>
+              <option value="31-45">31–45</option>
+              <option value="46-60">46–60</option>
+              <option value="60+">60+</option>
+            </select>
+            <select id="predPageSize">
+              <option value="10">10 / page</option>
+              <option value="15">15 / page</option>
+              <option value="20">20 / page</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="predictionsTable">
+            <thead>
+              <tr>
+                <th data-sort="id" class="sortable">ID <span class="sort-icon">↕</span></th>
+                <th data-sort="user_id" class="sortable">User ID <span class="sort-icon">↕</span></th>
+                <th data-sort="age" class="sortable">Age <span class="sort-icon">↕</span></th>
+                <th data-sort="bmi" class="sortable">BMI <span class="sort-icon">↕</span></th>
+                <th data-sort="children" class="sortable">Children <span class="sort-icon">↕</span></th>
+                <th>Smoker</th>
+                <th data-sort="prediction" class="sortable">Prediction <span class="sort-icon">↕</span></th>
+              </tr>
+            </thead>
+            <tbody id="predictionsTableBody">
+              <!-- filled by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar" id="predictionsPagination"></div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS SECTION -->
+    <section class="section" id="section-analytics">
+      <div class="section-header">
+        <h2>Analytics</h2>
+        <p>Visual insights from prediction data</p>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="chart-card wide">
+          <div class="card-header">
+            <div>
+              <h3>Prediction Cost Distribution</h3>
+              <p>Insurance cost per prediction entry</p>
+            </div>
+            <select id="chartTypeSelect">
+              <option value="line">Line Chart</option>
+              <option value="bar">Bar Chart</option>
+            </select>
+          </div>
+          <div class="chart-container tall">
+            <canvas id="mainChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card half">
+          <div class="card-header">
+            <div>
+              <h3>Smoker vs Non-Smoker</h3>
+              <p>Ratio of prediction entries</p>
+            </div>
+          </div>
+          <div class="chart-container medium">
+            <canvas id="smokerChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card half">
+          <div class="card-header">
+            <div>
+              <h3>Age Distribution</h3>
+              <p>Users grouped by age range</p>
+            </div>
+          </div>
+          <div class="chart-container medium">
+            <canvas id="ageChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="insurancedashboard1.js"></script>
+</body>
+</html>
