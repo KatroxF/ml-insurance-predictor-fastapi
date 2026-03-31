@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY backend /app/backend
 
+COPY notebook /app/notebook
+
 ENV PYTHONPATH=/app
 
 RUN pip install --no-cache-dir -r backend/requirements.txt
