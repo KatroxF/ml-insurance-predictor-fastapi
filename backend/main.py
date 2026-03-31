@@ -5,17 +5,17 @@ import shap
 import time
 from fastapi import FastAPI, Depends, HTTPException, Query, Request
 import logging
-from .database import engine, SessionLocal, Base
+from backend.database import engine, SessionLocal, Base
 from sqlalchemy.orm import Session
 
-from . import schemas
-from . import create
-from . import utils
-from . import models
+from backend import schemas
+from backend import create
+from backend import utils
+from backend import models
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from .auth import create_access_token, get_current_user
+from backend.auth import create_access_token, get_current_user
 
 from sqlalchemy import func as sqlfunc
 

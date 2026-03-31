@@ -1,6 +1,6 @@
-from .database import SessionLocal
-from .import models
-from .utils import hashed_password   # your function
+from backend.database import SessionLocal
+from backend import models
+from backend.utils import hashed_password   # your function
 
 db = SessionLocal()
 

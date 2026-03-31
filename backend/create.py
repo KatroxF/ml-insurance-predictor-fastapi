@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from . import schemas
-from .import models
+from backend import schemas
+from backend import models
 
 def create_insurance(db:Session,data:schemas.Model_input,prediction:int,user_id):
     db_data=models.Insurance(

@@ -2,7 +2,7 @@ from datetime import datetime,timedelta,timezone
 from authlib.jose import jwt ,JoseError
 from fastapi import HTTPException,Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from .config import SECRET_KEY
+from backend.config import SECRET_KEY
 
 
 
