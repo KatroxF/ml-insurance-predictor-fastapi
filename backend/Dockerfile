@@ -2,8 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY . .
+COPY backend /app/backend
 
-RUN pip install --no-cache-dir -r requirements.txt
+ENV PYTHONPATH=/app
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "10000"]
