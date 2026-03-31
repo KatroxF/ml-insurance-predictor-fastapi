@@ -1,8 +1,13 @@
 document.getElementById("registerBtn").addEventListener("click", signup);
+const API_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:8000"
+        : "";
 
 async function signup() {
     try {
-        const response = await fetch("http://127.0.0.1:8000/register", {
+        const response = await fetch(`${API_URL}/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
