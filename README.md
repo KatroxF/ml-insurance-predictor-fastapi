@@ -38,6 +38,71 @@ Users can securely sign up, log in, and get real-time predictions along with exp
 
 Additionally, SHAP is used to provide explainability, helping users understand how each feature contributes to their prediction.
 
+---
+
+## 🗄️ Database Design + System Details
+
+### 🗄️ Database Design
+
+The application uses a relational database with a **one-to-many relationship** between users and insurance records.
+
+#### 👤 User Table
+- Stores user credentials and role information  
+- Fields: `id`, `username`, `email`, `hashed_password`, `role`, `created_at`, `last_active`  
+
+#### 📊 Insurance Records Table
+- Stores user input data and prediction results  
+- Fields: `id`, `user_id`, `age`, `bmi`, `children`, `smoker_encoded`, `prediction`  
+
+#### 🔗 Relationship
+- One user can have multiple insurance prediction records  
+- Implemented using SQLAlchemy ORM relationships and foreign keys  
+
+---
+
+### ⚡ Performance Optimization
+
+- The trained ML model is serialized using **joblib** and loaded once at application startup  
+- This avoids repeated loading overhead and ensures low-latency predictions (~40–50ms response time)  
+
+---
+
+### 🔐 Security
+
+- Passwords are securely hashed using **Argon2** via Passlib  
+- JWT-based authentication is used for secure API access  
+- Role-based access control implemented (`user` vs `admin`)  
+- Rate limiting applied on authentication and prediction endpoints to prevent brute-force attacks and API abuse  
+---
+
+### 🧠 Explainability
+
+- SHAP values are generated using **LinearExplainer**  
+- Feature contributions are returned along with predictions for transparency  
+
+---
+
+### ⚠️ Error Handling
+
+- Input validation handled using **Pydantic models**  
+- Custom HTTP exceptions implemented for consistent API error responses  
+
+
+
+### 📦 Example API Usage
+
+#### Request
+```json
+POST /predict
+
+{
+  "age": 25,
+  "bmi": 28.5,
+  "children": 1,
+  "smoker": 1
+} 
+```
+
 ## ⚙️ Tech Stack
 
 ### 🖥️ Frontend
