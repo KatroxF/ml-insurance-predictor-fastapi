@@ -23,6 +23,20 @@ Users can securely sign up, log in, and get real-time predictions along with exp
 - 🐳 Dockerized backend deployment on Render
 
 ---
+## 📊 Model Selection & Justification
+
+- Performed exploratory data analysis (EDA) to understand feature relationships  
+- Observed strong linear correlation between key features (age, BMI, smoker status) and insurance charges  
+- Applied log transformation to handle skewness in the target variable  
+- Evaluated model performance and found that Linear Regression performed effectively for this dataset  
+
+### ✅ Why Linear Regression?
+
+- Simplicity and interpretability  
+- Fast inference (ideal for real-time API responses)  
+- Comparable performance to more complex models  
+
+Additionally, SHAP is used to provide explainability, helping users understand how each feature contributes to their prediction.
 
 ## ⚙️ Tech Stack
 
