@@ -115,11 +115,14 @@ To ensure observability and track API usage, the application implements a custom
 
 ### 📦 Example API Usage
 
-```markdown
 #### Request
 
-POST /predict
+`POST /predict`
 
+**Headers:**
+`Content-Type: application/json`
+
+**Body:**
 ```json
 {
   "age": 25,
@@ -127,6 +130,14 @@ POST /predict
   "children": 1,
   "smoker": 1
 }
+```
+
+#### Response
+
+**Status:** `200 OK`
+
+**Body:**
+```json
 {
   "prediction": 32000,
   "explanation": {
@@ -136,7 +147,6 @@ POST /predict
   }
 }
 ```
-
 ## ⚙️ Tech Stack
 
 ### 🖥️ Frontend
