@@ -72,8 +72,32 @@ The application uses a relational database with a **one-to-many relationship** b
 - Passwords are securely hashed using **Argon2** via Passlib  
 - JWT-based authentication is used for secure API access  
 - Role-based access control implemented (`user` vs `admin`)  
-- Rate limiting applied on authentication and prediction endpoints to prevent brute-force attacks and API abuse  
+- Rate limiting applied on authentication and prediction endpoints to prevent brute-force attacks and API abuse
 ---
+
+### 📜 API Logging & Monitoring
+
+To ensure observability and track API usage, the application implements a custom logging system that records every incoming request.
+
+#### 📌 What is Logged?
+
+- 🌐 Client IP address  
+- 🔁 HTTP method (GET, POST, OPTIONS, etc.)  
+- 🔗 Requested endpoint  
+- ✅ Response status code  
+- ⏱️ Response time (latency)
+
+---
+
+#### 🧾 Sample Logs
+
+```text
+2026-03-17 22:15:12 | INFO | IP: 127.0.0.1 | Method: OPTIONS | URL: /login | Status: 200 | Time: 0.0000s
+2026-03-17 22:15:12 | INFO | IP: 127.0.0.1 | Method: POST | URL: /login | Status: 200 | Time: 0.1789s
+2026-03-17 22:17:31 | INFO | IP: 127.0.0.1 | Method: OPTIONS | URL: /predict | Status: 200 | Time: 0.0000s
+2026-03-17 22:17:31 | INFO | IP: 127.0.0.1 | Method: POST | URL: /predict | Status: 200 | Time: 0.0685s
+---
+```
 
 ### 🧠 Explainability
 
@@ -91,16 +115,26 @@ The application uses a relational database with a **one-to-many relationship** b
 
 ### 📦 Example API Usage
 
+```markdown
 #### Request
-```json
+
 POST /predict
 
+```json
 {
   "age": 25,
   "bmi": 28.5,
   "children": 1,
   "smoker": 1
-} 
+}
+{
+  "prediction": 32000,
+  "explanation": {
+    "age": 1200,
+    "bmi": 800,
+    "smoker": 15000
+  }
+}
 ```
 
 ## ⚙️ Tech Stack
