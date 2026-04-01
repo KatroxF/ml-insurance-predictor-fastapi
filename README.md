@@ -91,3 +91,19 @@ https://insurance-backend-ewkb.onrender.com/docs
 ├── docker-compose.yml
 ├── alembic.ini
 └── README.md
+
+## 📸 Screenshots
+
+## 📸 Screenshots
+
+### 🧠 Prediction Page (Input + Result + Explainability)
+![Prediction](screenshots/prediction-page.png)
+
+### 📊 Dashboard Overview
+![Dashboard](screenshots/dashboard-overview.png)
+
+### 📈 Analytics
+![Analytics](screenshots/analytics.png)
+
+### 📋 Prediction History
+![History](screenshots/prediction-history.png)
