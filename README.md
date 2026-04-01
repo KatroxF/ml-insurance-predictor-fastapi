@@ -79,18 +79,19 @@ Users can securely sign up, log in, and get real-time predictions along with exp
 👉 Full API docs available at:  
 https://insurance-backend-ewkb.onrender.com/docs
 
----
-
 ## 📂 Project Structure
+
+```bash
 .
-├── frontend/ # UI (HTML, CSS, JS)
-├── backend/ # FastAPI backend
-├── ml_code/ # ML model logic
-├── notebook/ # Model experimentation
-├── alembic/ # DB migrations
+├── frontend/        # UI (HTML, CSS, JS)
+├── backend/         # FastAPI backend
+├── ml_code/         # ML model logic
+├── notebook/        # Model experimentation
+├── alembic/         # DB migrations
 ├── docker-compose.yml
 ├── alembic.ini
 └── README.md
+```
 
 ## 📸 Screenshots
 
