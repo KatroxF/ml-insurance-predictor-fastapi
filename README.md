@@ -1,6 +1,7 @@
 # 🚀 Insurance Risk Prediction System (Full Stack + ML)
 
-A full-stack web application that predicts insurance costs using a machine learning model.  
+A full-stack web application that helps users estimate and understand their insurance costs in advance, using a machine learning model with explainability to support better financial planning.
+
 Users can securely sign up, log in, and get real-time predictions along with explainability of how each feature affects the result.
 
 ---
