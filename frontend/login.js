@@ -21,6 +21,12 @@ async function login() {
 
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
+    const messageEl = document.getElementById("message");
+    if (!email || !password) {
+    messageEl.style.color = "red";
+    messageEl.innerText = "Please fill all fields";
+    return;
+}
 
     try {
 
@@ -38,15 +44,32 @@ async function login() {
         const data = await response.json();
 
         if (!response.ok) {
-            document.getElementById("message").innerText =
-                data.detail || "Login failed.";
+            let errorMessage = "Login failed.";
+
+            
+            if (Array.isArray(data.detail)) {
+                const msg = data.detail[0].msg;
+
+                if (msg.includes("valid email")) {
+                    errorMessage = "Please enter a valid email address";
+                } else {
+                    errorMessage = msg;
+                }
+
+            
+            } else if (typeof data.detail === "string") {
+                errorMessage = "Invalid email or password";
+            }
+
+            messageEl.style.color = "red";
+            messageEl.innerText = errorMessage;
             return;
         }
 
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("role", data.role);
-        document.getElementById("message").style.color = "green";
-        document.getElementById("message").innerText = "Login successful!";
+        messageEl.style.color = "green";
+        messageEl.innerText = "Login successful!";
 
         if (data.role === "admin") {
 
