@@ -217,7 +217,11 @@ https://insurance-backend-ewkb.onrender.com/docs
 ├── alembic.ini
 └── README.md
 ```
+## 🔑 Demo Credentials
 
+### 👤 Admin Access
+- Email: admin@gmail.com  
+- Password: admin123
 ## 📸 Screenshots
 
 ## 📸 Screenshots
