@@ -4,8 +4,9 @@ const API_URL =
     window.location.hostname === "127.0.0.1"
         ? "http://127.0.0.1:8000"
         : "https://insurance-backend-ewkb.onrender.com";
-
 async function signup() {
+    const messageEl = document.getElementById("message"); 
+
     try {
         const response = await fetch(`${API_URL}/register`, {
             method: "POST",
@@ -21,17 +22,36 @@ async function signup() {
 
         const data = await response.json();
 
-        document.getElementById("message").innerText =
-            data.message || data.detail;
+        if (!response.ok) {
+            let errorMessage = "Signup failed.";
 
-        if (response.ok) {
-            setTimeout(() => {
-                window.location.href = "login.html";
-            }, 1500);
+            if (Array.isArray(data.detail)) {
+                const msg = data.detail[0].msg;
+
+                if (msg.includes("valid email")) {
+                    errorMessage = "Please enter a valid email address";
+                } else if (msg.includes("at least 8 characters")) {
+                    errorMessage = "Password must be at least 8 characters";
+                } else {
+                    errorMessage = msg;
+                }
+            }
+
+            messageEl.style.color = "red";
+            messageEl.innerText = errorMessage;
+            return;
         }
 
+        // success
+        messageEl.style.color = "green";
+        messageEl.innerText = "Signup successful! Redirecting...";
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
+
     } catch (error) {
-        document.getElementById("message").innerText =
-            "Server error. Please try again.";
+        messageEl.style.color = "red"; // 
+        messageEl.innerText = "Server error. Please try again.";
     }
 }
