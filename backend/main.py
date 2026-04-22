@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import shap
 import time
+from datetime import datetime,timezone,timedelta
 from fastapi import FastAPI, Depends, HTTPException, Query, Request
 import logging
 from backend.database import engine, SessionLocal, Base
@@ -23,6 +24,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from backend.database import get_db
 
 
 
@@ -47,37 +49,67 @@ app = FastAPI()
 app.add_middleware(SlowAPIMiddleware)
 app.state.limiter=limiter
 app.add_exception_handler(RateLimitExceeded,_rate_limit_exceeded_handler)
-origins = [    
-    "http://127.0.0.1:3000",
-    "http://localhost:3000",
-]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-@app.middleware('http')
-async def log_requests(request, call_next):  
-     start_time = time.time()                
-     response = await call_next(request)
-     process_time = time.time() - start_time
-     client_ip = request.client.host
 
-     
-     logger.info(
-          f"IP: {client_ip} | "
-          f"Method: {request.method} | "
-          f"URL: {request.url.path} | "
-          f"Status: {response.status_code} | "
-          f"Time: {process_time:.4f}s"
-     )
-     return response
 
+
+
+
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    client_ip = request.client.host if request.client else "unknown"
+
+    user = getattr(request.state, "user", None)
+
+    if user:
+        db = SessionLocal()
+        try:
+            db_user = db.merge(user)
+            now = datetime.now(timezone.utc)
+
+            # Normalize last_active to timezone-aware before comparing
+            last = db_user.last_active
+            if last and last.tzinfo is None:
+                last = last.replace(tzinfo=timezone.utc)
+
+            if last is None or (now - last > timedelta(minutes=5)):
+                db_user.last_active = now
+                db.commit()
+
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to update user activity: {e}")
+        finally:
+            db.close()
+
+    logger.info(
+        f"IP: {client_ip} | Method: {request.method} | "
+        f"URL: {request.url.path} | Status: {response.status_code} | "
+        f"Time: {process_time:.4f}s"
+    )
+    return response
+
+ACTIVE_THRESHOLD = timedelta(minutes=5)
 
 model = joblib.load("backend/model1.pkl")
 def preprocess(df):
@@ -88,12 +120,8 @@ background = preprocess(raw_df)
 background = background.sample(100, random_state=42)
 
 explainer=shap.LinearExplainer(model,background)
-def get_db():
-    db=SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
+
 @app.get("/predictions")
 def get_predictions(
     user=Depends(get_current_user),
@@ -101,7 +129,7 @@ def get_predictions(
     page: int = 1,
     limit: int = 10
 ):
-    if user["role"] != "admin":
+    if user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     skip = (page - 1) * limit
     records = (
@@ -124,7 +152,7 @@ def get_predictions(
  
 @app.get("/stats")
 def get_stats(user=Depends(get_current_user), db: Session = Depends(get_db)):
-    if user["role"] != "admin":
+    if user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     total_users = db.query(models.User).count()
     total_predictions = db.query(models.Insurance).count()
@@ -147,34 +175,33 @@ def get_stats(user=Depends(get_current_user), db: Session = Depends(get_db)):
         "non_smoker_count": total_predictions - smoker_count,
         "trend": trend
     }
-@app.get('/dashboard',response_model=schemas.DashboardResponse)
-def dashboard(user=Depends(get_current_user),db:Session=Depends(get_db),page:int=1,limit:int=10):
-     if user["role"]!="admin":
-          raise HTTPException(status_code=403,detail="Admins only")
-     skip=(page-1)*limit
-     users=(
-          db.query(models.User)
-          .offset(skip)
-          .limit(limit)
-          .all()
-     )
-     total=db.query(models.User).count()
-     data=[{
-          "id":u.id,
-          "username":u.username,
-          "email":u.email,
-          "created_at": u.created_at,
-          "status":"Active"
-          
-     }for u in users
-     ]
-     return{
-        "data": data,
-        "total": total,
-        "page": page,
-        "limit": limit
-     }
+@app.get('/dashboard', response_model=schemas.DashboardResponse)
+def dashboard(user=Depends(get_current_user), db: Session = Depends(get_db), page: int = 1, limit: int = 10):
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
 
+    skip = (page - 1) * limit
+    users = db.query(models.User).offset(skip).limit(limit).all()
+    total = db.query(models.User).count()
+    now = datetime.now(timezone.utc)
+
+    def to_aware(dt):
+        if dt is None:
+            return None
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+
+    data = [{
+        "id": u.id,
+        "username": u.username,
+        "email": u.email,
+        "created_at": u.created_at,
+        "last_active": to_aware(u.last_active).isoformat() if u.last_active else None,
+        "status": "Active" if (
+            u.last_active and (now - to_aware(u.last_active)) <= ACTIVE_THRESHOLD
+        ) else "Idle"
+    } for u in users]
+
+    return {"data": data, "total": total, "page": page, "limit": limit}
 @app.post('/register',response_model=schemas.MessageResponse)  
 @limiter.limit("3/minute")
 def register(request: Request,user:schemas.UserCreate,db:Session=Depends(get_db)):
@@ -217,6 +244,7 @@ def login(request:Request,user:schemas.UserLogin,db:Session=Depends(get_db)):
           raise HTTPException(status_code=401,detail="Invalid email or password")
      if not utils.verify_password(user.password,db_user.hashed_password):
           raise HTTPException(status_code=401,detail="Invalid email or password")
+     request.state.user = db_user
      token=create_access_token({
           "user_id": db_user.id,
           "role": db_user.role
@@ -229,7 +257,7 @@ def login(request:Request,user:schemas.UserLogin,db:Session=Depends(get_db)):
 @app.post("/predict",response_model=schemas.Output_Schema)
 @limiter.limit("30/minute")
 def predicts(request: Request,data:schemas.Model_input,user=Depends(get_current_user),db: Session = Depends(get_db)):
-      if user["role"]!="user":
+      if user.role!= "user":
             raise HTTPException(status_code=403, detail="Users only")
       
       input_df=pd.DataFrame([{
@@ -264,7 +292,7 @@ def predicts(request: Request,data:schemas.Model_input,user=Depends(get_current_
         db=db,
         data=data,
         prediction=int(prediction),
-        user_id=user["user_id"]
+        user_id=user.id
     )
 
 

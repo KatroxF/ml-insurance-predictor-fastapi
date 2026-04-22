@@ -1,8 +1,6 @@
-
-
-const API_BASE=window.location.hostname=="localhost"
-?"http://127.0.0.1:8000"
-:"https://insurance-backend-ewkb.onrender.com"
+const API_BASE = (window.location.hostname == "localhost" || window.location.hostname == "127.0.0.1")
+  ? "http://127.0.0.1:8000"
+  : "https://insurance-backend-ewkb.onrender.com"
 
 
 function getToken() {
@@ -93,22 +91,17 @@ function initSidebarNav() {
       e.preventDefault();
       const target = item.dataset.section;
 
-      
       navItems.forEach((n) => n.classList.remove("active"));
       item.classList.add("active");
 
-      
       if (pageTitle) pageTitle.textContent = sectionTitles[target] || target;
 
-      
       sections.forEach((s) => s.classList.remove("active"));
       const activeSection = document.getElementById(`section-${target}`);
       if (activeSection) activeSection.classList.add("active");
 
-      
       document.querySelector(".sidebar").classList.remove("open");
 
-      
       if (target === "users") loadUsers(1);
       if (target === "predictions") loadPredictions(1);
       if (target === "analytics") loadAnalytics();
@@ -126,7 +119,6 @@ function initMobileMenu() {
     sidebar.classList.toggle("open");
   });
 
-  
   document.addEventListener("click", (e) => {
     if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
       sidebar.classList.remove("open");
@@ -144,7 +136,6 @@ async function loadOverview() {
 
     const stats = await res.json();
 
-    
     animateNumber("totalUsersNum", stats.total_users);
     animateNumber("totalPredictionsNum", stats.total_predictions);
     document.getElementById("avgPredictionNum").textContent =
@@ -152,7 +143,6 @@ async function loadOverview() {
     document.getElementById("smokerNum").textContent =
       stats.smoker_rate + "%";
 
-    
     drawOverviewChart(stats.trend);
 
   } catch (err) {
@@ -241,11 +231,26 @@ function drawOverviewChart(trend) {
   });
 }
 
+
+// ============================================================
+// ACTIVITY STATUS HELPER
+// ============================================================
+function getUserStatus(lastActive) {
+  if (!lastActive) return { label: "Never Active", color: "#7889aa" };
+
+  const diffMs = Date.now() - new Date(lastActive).getTime();
+  const diffMins = diffMs / 60000;
+
+  if (diffMins <= 5)  return { label: "Active",  color: "#00d4b4" };
+  if (diffMins <= 60) return { label: "Idle",    color: "#fbbf24" };
+  return                     { label: "Offline", color: "#fb7185" };
+}
+
+
 // ============================================================
 // USERS TABLE
 // ============================================================
 function initUserTableControls() {
-  // Search
   const searchInput = document.getElementById("userSearch");
   if (searchInput) {
     searchInput.addEventListener("input", () => {
@@ -255,7 +260,6 @@ function initUserTableControls() {
     });
   }
 
-  // Date filter
   const dateFilter = document.getElementById("userDateFilter");
   if (dateFilter) {
     dateFilter.addEventListener("change", () => {
@@ -265,7 +269,6 @@ function initUserTableControls() {
     });
   }
 
-  // Page size
   const pageSizeSelect = document.getElementById("userPageSize");
   if (pageSizeSelect) {
     pageSizeSelect.addEventListener("change", (e) => {
@@ -275,7 +278,6 @@ function initUserTableControls() {
     });
   }
 
-  // Column sort
   document.querySelectorAll("#usersTable th.sortable").forEach((th) => {
     th.addEventListener("click", () => {
       const key = th.dataset.sort;
@@ -294,7 +296,6 @@ function initUserTableControls() {
 
 async function loadUsers(page = 1) {
   usersState.currentPage = page;
-
   const tbody = document.getElementById("usersTableBody");
   if (tbody) tbody.innerHTML = renderLoadingRows(5, 5);
 
@@ -313,6 +314,7 @@ async function loadUsers(page = 1) {
 
     const result = await res.json();
 
+    // last_active already included in each row
     usersState.allData = result.data;
     usersState.totalPages = Math.ceil(result.total / usersState.limit);
 
@@ -332,7 +334,6 @@ function applyUsersFilter() {
 
   let data = [...usersState.allData];
 
-  // Search filter
   if (query) {
     data = data.filter(
       (u) =>
@@ -341,7 +342,6 @@ function applyUsersFilter() {
     );
   }
 
-  // Date filter
   if (dateFilter !== "all") {
     const now = new Date();
     data = data.filter((u) => {
@@ -365,7 +365,6 @@ function applyUsersFilter() {
     });
   }
 
-  // Sort
   if (usersState.sortKey) {
     data.sort((a, b) => {
       let valA = a[usersState.sortKey];
@@ -414,21 +413,35 @@ function renderUsersTable() {
           })
         : "—";
 
+      const { label, color } = getUserStatus(user.last_active);
+
       return `
         <tr>
           <td><span class="id-badge">#${user.id}</span></td>
           <td>${escapeHtml(user.username)}</td>
           <td>${escapeHtml(user.email)}</td>
           <td>${createdAt}</td>
-          <td><span class="status-active">Active</span></td>
+          <td>
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:0.8rem; font-weight:500; color:${color};">
+              <span style="
+                width: 8px; height: 8px; border-radius: 50%;
+                background: ${color};
+                box-shadow: 0 0 6px ${color};
+                flex-shrink: 0;
+              "></span>
+              ${label}
+            </span>
+          </td>
         </tr>`;
     })
     .join("");
 }
 
 
+// ============================================================
+// PREDICTIONS TABLE
+// ============================================================
 function initPredTableControls() {
-  
   const searchInput = document.getElementById("predSearch");
   if (searchInput) {
     searchInput.addEventListener("input", () => {
@@ -438,7 +451,6 @@ function initPredTableControls() {
     });
   }
 
-  
   const smokerFilter = document.getElementById("smokerFilter");
   if (smokerFilter) {
     smokerFilter.addEventListener("change", () => {
@@ -448,7 +460,6 @@ function initPredTableControls() {
     });
   }
 
-  
   const ageFilter = document.getElementById("predAgeFilter");
   if (ageFilter) {
     ageFilter.addEventListener("change", () => {
@@ -458,7 +469,6 @@ function initPredTableControls() {
     });
   }
 
-  
   const pageSizeSelect = document.getElementById("predPageSize");
   if (pageSizeSelect) {
     pageSizeSelect.addEventListener("change", (e) => {
@@ -468,7 +478,6 @@ function initPredTableControls() {
     });
   }
 
-  
   document.querySelectorAll("#predictionsTable th.sortable").forEach((th) => {
     th.addEventListener("click", () => {
       const key = th.dataset.sort;
@@ -526,16 +535,13 @@ function applyPredsFilter() {
 
   let data = [...predsState.allData];
 
-  
   if (query) {
     data = data.filter((p) => String(p.user_id).includes(query));
   }
 
-  
   if (smokerVal === "yes") data = data.filter((p) => p.smoker_encoded === 1);
   if (smokerVal === "no") data = data.filter((p) => p.smoker_encoded === 0);
 
-  
   if (ageVal !== "all") {
     const [minStr, maxStr] = ageVal.split("-");
     const min = parseInt(minStr);
@@ -547,7 +553,6 @@ function applyPredsFilter() {
     }
   }
 
-  
   if (predsState.sortKey) {
     data.sort((a, b) => {
       const valA = a[predsState.sortKey];
@@ -601,6 +606,9 @@ function renderPredsTable() {
 }
 
 
+// ============================================================
+// PAGINATION
+// ============================================================
 function renderPagination(type) {
   const isUsers = type === "users";
   const state = isUsers ? usersState : predsState;
@@ -614,7 +622,6 @@ function renderPagination(type) {
 
   container.innerHTML = "";
 
-  
   const infoEl = document.createElement("div");
   infoEl.className = "pagination-info";
   const start = dataLen === 0 ? 0 : (state.currentPage - 1) * state.limit + 1;
@@ -622,11 +629,9 @@ function renderPagination(type) {
   infoEl.textContent = `Showing ${start}–${end} of ${totalCount} entries`;
   container.appendChild(infoEl);
 
-  
   const btnsWrap = document.createElement("div");
   btnsWrap.className = "pagination-buttons";
 
-  
   const prevBtn = document.createElement("button");
   prevBtn.className = "page-btn";
   prevBtn.textContent = "Prev";
@@ -634,7 +639,6 @@ function renderPagination(type) {
   prevBtn.addEventListener("click", () => loadFn(state.currentPage - 1));
   btnsWrap.appendChild(prevBtn);
 
-  
   const pages = buildPageRange(state.currentPage, state.totalPages);
 
   pages.forEach((p) => {
@@ -652,7 +656,6 @@ function renderPagination(type) {
     }
   });
 
-  
   const nextBtn = document.createElement("button");
   nextBtn.className = "page-btn";
   nextBtn.textContent = "Next";
@@ -678,20 +681,20 @@ function buildPageRange(current, total) {
 }
 
 
+// ============================================================
+// ANALYTICS
+// ============================================================
 async function loadAnalytics() {
   try {
     const res = await fetch(`${API_BASE}/stats`, { headers: authHeaders() });
     if (!res.ok) throw new Error("Stats fetch failed");
     const stats = await res.json();
 
-    
     drawMainChart(stats.trend, "line");
     drawSmokerChart(stats.smoker_count, stats.non_smoker_count);
 
-    
     await loadAgeDistribution();
 
-    
     const chartTypeSelect = document.getElementById("chartTypeSelect");
     if (chartTypeSelect) {
       chartTypeSelect.addEventListener("change", (e) => {
@@ -706,7 +709,6 @@ async function loadAnalytics() {
 
 async function loadAgeDistribution() {
   try {
-    
     const res = await fetch(`${API_BASE}/predictions?page=1&limit=100`, {
       headers: authHeaders(),
     });
@@ -895,6 +897,9 @@ function drawAgeChart(buckets) {
 }
 
 
+// ============================================================
+// UTILITIES
+// ============================================================
 function updateSortIcons(tableId, activeKey, dir) {
   document.querySelectorAll(`#${tableId} th.sortable`).forEach((th) => {
     th.classList.remove("sorted-asc", "sorted-desc");

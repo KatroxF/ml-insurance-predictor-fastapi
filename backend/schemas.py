@@ -1,5 +1,7 @@
 from pydantic import BaseModel,EmailStr,Field,field_validator
 from typing import Dict
+from typing import Optional
+from datetime import datetime
 class UserCreate(BaseModel):
      username:str
      email:EmailStr
@@ -45,6 +47,10 @@ class Userout(BaseModel):
      id:int
      username:str
      email:str
+     created_at: Optional[datetime] = None
+     last_active: Optional[datetime] = None
+     
+    
 class DashboardResponse(BaseModel):
     data: list[Userout]
     total: int
