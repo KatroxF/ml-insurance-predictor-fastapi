@@ -3,7 +3,7 @@ const API_URL =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
         ? "http://127.0.0.1:8000"
-        : "https://ml-insurance-predictor-fastapi.onrender.com";
+        : "https://insurance-backend-ewkb.onrender.com";
 async function signup() {
     const messageEl = document.getElementById("message"); 
 
