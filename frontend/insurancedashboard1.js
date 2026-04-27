@@ -3,20 +3,24 @@ const API_BASE = (window.location.hostname == "localhost" || window.location.hos
   : "https://insurance-backend-ewkb.onrender.com"
 
 
-function getToken() {
-  return localStorage.getItem("access_token") || "";
-}
+async function guardAuth() {
+  try {
+    const res = await fetch(`${API_BASE}/me`, {
+      credentials: "include"
+    });
 
-function authHeaders() {
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
-  };
-}
+    if (!res.ok) {
+      window.location.href = "login.html";
+      return;
+    }
 
+    const data = await res.json();
 
-function guardAuth() {
-  if (!getToken()) {
+    if (data.role !== "admin") {
+      window.location.href = "predict.html";
+    }
+
+  } catch {
     window.location.href = "login.html";
   }
 }
@@ -26,8 +30,8 @@ const usersState = {
   currentPage: 1,
   totalPages: 1,
   limit: 10,
-  allData: [],        
-  filtered: [],       
+  allData: [],
+  filtered: [],
   sortKey: null,
   sortDir: "asc",
 };
@@ -50,14 +54,14 @@ let ageChart = null;
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  guardAuth();
+document.addEventListener("DOMContentLoaded", async () => {
+  await guardAuth();
   setDateBadge();
   initSidebarNav();
   initMobileMenu();
   initUserTableControls();
   initPredTableControls();
-  loadOverview();           
+  loadOverview();
 });
 
 
@@ -129,7 +133,10 @@ function initMobileMenu() {
 
 async function loadOverview() {
   try {
-    const res = await fetch(`${API_BASE}/stats`, { headers: authHeaders() });
+    
+    const res = await fetch(`${API_BASE}/stats`, {
+      credentials: "include"
+    });
 
     if (res.status === 401) { guardAuth(); return; }
     if (!res.ok) throw new Error("Stats fetch failed");
@@ -147,7 +154,7 @@ async function loadOverview() {
 
   } catch (err) {
     console.error("Overview load error:", err);
-    showApiError("section-overview", "Could not load overview stats. Check your connection and token.");
+    showApiError("section-overview", "Could not load overview stats. Check your connection.");
   }
 }
 
@@ -232,9 +239,6 @@ function drawOverviewChart(trend) {
 }
 
 
-// ============================================================
-// ACTIVITY STATUS HELPER
-// ============================================================
 function getUserStatus(lastActive) {
   if (!lastActive) return { label: "Never Active", color: "#7889aa" };
 
@@ -247,9 +251,6 @@ function getUserStatus(lastActive) {
 }
 
 
-// ============================================================
-// USERS TABLE
-// ============================================================
 function initUserTableControls() {
   const searchInput = document.getElementById("userSearch");
   if (searchInput) {
@@ -300,9 +301,10 @@ async function loadUsers(page = 1) {
   if (tbody) tbody.innerHTML = renderLoadingRows(5, 5);
 
   try {
+    // FIX: use credentials: "include" for cookie-based auth (removed authHeaders())
     const res = await fetch(
       `${API_BASE}/dashboard?page=${page}&limit=${usersState.limit}`,
-      { headers: authHeaders() }
+      { credentials: "include" }
     );
 
     if (res.status === 401) { guardAuth(); return; }
@@ -314,7 +316,6 @@ async function loadUsers(page = 1) {
 
     const result = await res.json();
 
-    // last_active already included in each row
     usersState.allData = result.data;
     usersState.totalPages = Math.ceil(result.total / usersState.limit);
 
@@ -438,9 +439,6 @@ function renderUsersTable() {
 }
 
 
-// ============================================================
-// PREDICTIONS TABLE
-// ============================================================
 function initPredTableControls() {
   const searchInput = document.getElementById("predSearch");
   if (searchInput) {
@@ -501,9 +499,10 @@ async function loadPredictions(page = 1) {
   if (tbody) tbody.innerHTML = renderLoadingRows(7, 8);
 
   try {
+    // FIX: use credentials: "include" for cookie-based auth (removed authHeaders())
     const res = await fetch(
       `${API_BASE}/predictions?page=${page}&limit=${predsState.limit}`,
-      { headers: authHeaders() }
+      { credentials: "include" }
     );
 
     if (res.status === 401) { guardAuth(); return; }
@@ -524,7 +523,7 @@ async function loadPredictions(page = 1) {
 
   } catch (err) {
     console.error("Load predictions error:", err);
-    showTableError("predictionsTableBody", 7, "Could not load predictions. Add the /predictions endpoint to your FastAPI.");
+    showTableError("predictionsTableBody", 7, "Could not load predictions.");
   }
 }
 
@@ -606,9 +605,6 @@ function renderPredsTable() {
 }
 
 
-// ============================================================
-// PAGINATION
-// ============================================================
 function renderPagination(type) {
   const isUsers = type === "users";
   const state = isUsers ? usersState : predsState;
@@ -681,12 +677,10 @@ function buildPageRange(current, total) {
 }
 
 
-// ============================================================
-// ANALYTICS
-// ============================================================
 async function loadAnalytics() {
   try {
-    const res = await fetch(`${API_BASE}/stats`, { headers: authHeaders() });
+    
+    const res = await fetch(`${API_BASE}/stats`, { credentials: "include" });
     if (!res.ok) throw new Error("Stats fetch failed");
     const stats = await res.json();
 
@@ -709,8 +703,9 @@ async function loadAnalytics() {
 
 async function loadAgeDistribution() {
   try {
+    
     const res = await fetch(`${API_BASE}/predictions?page=1&limit=100`, {
-      headers: authHeaders(),
+      credentials: "include",
     });
     if (!res.ok) return;
     const result = await res.json();
@@ -897,9 +892,6 @@ function drawAgeChart(buckets) {
 }
 
 
-// ============================================================
-// UTILITIES
-// ============================================================
 function updateSortIcons(tableId, activeKey, dir) {
   document.querySelectorAll(`#${tableId} th.sortable`).forEach((th) => {
     th.classList.remove("sorted-asc", "sorted-desc");

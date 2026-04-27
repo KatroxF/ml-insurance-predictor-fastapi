@@ -1,10 +1,12 @@
+
+
 import joblib
 import pandas as pd
 import numpy as np
 import shap
 import time
 from datetime import datetime,timezone,timedelta
-from fastapi import FastAPI, Depends, HTTPException, Query, Request
+from fastapi import FastAPI, Depends, HTTPException, Query, Request,Response
 import logging
 from backend.database import engine, SessionLocal, Base
 from sqlalchemy.orm import Session
@@ -65,19 +67,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-
-
-
-
-
-
-
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data:; "
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self';"
+    )
     process_time = time.time() - start_time
     client_ip = request.client.host if request.client else "unknown"
 
@@ -237,7 +241,7 @@ def register(request: Request,user:schemas.UserCreate,db:Session=Depends(get_db)
 
 @app.post("/login")
 @limiter.limit("5/minute")
-def login(request:Request,user:schemas.UserLogin,db:Session=Depends(get_db)):
+def login(response:Response,request:Request,user:schemas.UserLogin,db:Session=Depends(get_db)):
      db_user=db.query(models.User).filter(
           models.User.email==user.useremail
      ).first()
@@ -251,14 +255,21 @@ def login(request:Request,user:schemas.UserLogin,db:Session=Depends(get_db)):
           "user_id": db_user.id,
           "role": db_user.role
      })
+     response.set_cookie(
+          key="access_token",
+            value=token,
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+     )
      return {
-          "access_token": token,
+          "message": "Login successful",
           "role": db_user.role
      }
-     
+
 @app.post("/predict",response_model=schemas.Output_Schema)
-@limiter.limit("30/minute")
-def predicts(request: Request,data:schemas.Model_input,user=Depends(get_current_user),db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def predicts(response:Response,request: Request,data:schemas.Model_input,user=Depends(get_current_user),db: Session = Depends(get_db)):
       if user.role!= "user":
             raise HTTPException(status_code=403, detail="Users only")
       
@@ -306,7 +317,10 @@ def predicts(request: Request,data:schemas.Model_input,user=Depends(get_current_
            
 
            )
-
+@app.post('/logout')
+def logout(response:Response):
+    response.delete_cookie(key="access_token")
+    return {"message":"Logged out successfully"}
      
      
       

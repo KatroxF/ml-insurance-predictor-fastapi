@@ -1,4 +1,4 @@
-import { authHeader } from "./auth.js";
+
 document.getElementById("submit").addEventListener("click",predict);
 const API_URL = (window.location.hostname == "localhost" || window.location.hostname == "127.0.0.1")
   ? "http://127.0.0.1:8000"
@@ -10,8 +10,9 @@ async function predict(){
             method:"POST",
             headers:{
                 "Content-Type": "application/json",
-                ...authHeader()
+                
             },
+            credentials: "include", 
             body:JSON.stringify({
                 age:parseInt(document.getElementById("age").value),
                 bmi:parseFloat(document.getElementById("bmi").value),
@@ -94,9 +95,13 @@ function showErrors(errors) {
     });
 }
 
-document.getElementById("logout-btn").addEventListener("click",()=>{
-    localStorage.removeItem("access_token");
-    window.location.href="login.html"
-})
+async function logout() {
+    await fetch(`${API_URL}/logout`, {
+        method:"POST",
+        credentials : "include"
+    });
+    localStorage.removeItem("role")
+    window.location.href = "login.html";
+}
         
-    
+document.getElementById("logout-btn").addEventListener("click", logout);

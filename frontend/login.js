@@ -35,6 +35,7 @@ async function login() {
             headers: {
                 "Content-Type": "application/json"
             },
+            credentials: "include",
             body: JSON.stringify({
                 useremail: email,
                 password: password
@@ -66,7 +67,7 @@ async function login() {
             return;
         }
 
-        localStorage.setItem("access_token", data.access_token);
+        
         localStorage.setItem("role", data.role);
         messageEl.style.color = "green";
         messageEl.innerText = "Login successful!";
@@ -93,18 +94,3 @@ async function login() {
     }
 }
 
-function logout(){
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("role");
-    window.location.href="login.html"
-}
-
-function authHeader() {
-
-    const token = localStorage.getItem("access_token");
-
-    return {
-        "Authorization": "Bearer " + token
-    };
-
-}

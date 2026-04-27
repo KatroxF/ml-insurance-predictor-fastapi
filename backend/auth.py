@@ -2,7 +2,6 @@ from datetime import datetime,timedelta,timezone
 from authlib.jose import jwt ,JoseError
 from fastapi import HTTPException,Depends,Request
 from sqlalchemy.orm import Session
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from backend.config import SECRET_KEY
 from backend import models
 from backend.database import get_db
@@ -11,7 +10,7 @@ from backend.database import get_db
 
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRY_MINUTES = 30
-security = HTTPBearer()
+
 
 def create_access_token(data:dict):
     header={"alg":ALGORITHM}
@@ -23,15 +22,14 @@ def create_access_token(data:dict):
         "exp":expire
     })
     token= jwt.encode(header,payload, SECRET_KEY)
-    return token
+    return token.decode("utf-8") if isinstance(token, bytes) else token
 def get_current_user(
     request: Request,
-    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-
-    token = credentials.credentials
-
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     claims= verify_access_token(token)
     user_id=claims.get("user_id")
     if not user_id:
