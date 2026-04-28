@@ -72,16 +72,16 @@ async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; "
-        "script-src 'self'; "
-        "style-src 'self'; "
-        "img-src 'self' data:; "
-        "font-src 'self'; "
-        "connect-src 'self'; "
-        "frame-ancestors 'none'; "
-        "base-uri 'self'; "
-        "form-action 'self';"
-    )
+    "default-src 'self'; "
+    "script-src 'self'; "
+    "style-src 'self'; "
+    "img-src 'self' data:; "
+    "font-src 'self'; "
+    "connect-src 'self' https://insurance-backend-ewkb.onrender.com; "
+    "frame-ancestors 'none'; "
+    "base-uri 'self'; "
+    "form-action 'self';"
+)
     process_time = time.time() - start_time
     client_ip = request.client.host if request.client else "unknown"
 
@@ -259,8 +259,8 @@ def login(response:Response,request:Request,user:schemas.UserLogin,db:Session=De
           key="access_token",
             value=token,
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=True,
+            samesite="None",
      )
      return {
           "message": "Login successful",
