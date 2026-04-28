@@ -5,20 +5,21 @@ const API_BASE = (window.location.hostname == "localhost" || window.location.hos
 
 async function guardAuth() {
   try {
-    const res = await fetch(`${API_BASE}/me`, {
+    const res = await fetch(`${API_BASE}/predictions`, {
       credentials: "include"
     });
 
-    if (!res.ok) {
+    if (res.status === 401) {
       window.location.href = "login.html";
       return;
     }
 
-    const data = await res.json();
-
-    if (data.role !== "admin") {
+    if (res.status === 403) {
       window.location.href = "predict.html";
+      return;
     }
+
+    
 
   } catch {
     window.location.href = "login.html";

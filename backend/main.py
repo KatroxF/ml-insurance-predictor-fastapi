@@ -57,6 +57,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:3002",
         "http://localhost:3000",
         "http://127.0.0.1:5500",
         "http://localhost:5500",
@@ -77,7 +78,10 @@ async def log_requests(request: Request, call_next):
     "style-src 'self'; "
     "img-src 'self' data:; "
     "font-src 'self'; "
-    "connect-src 'self' https://insurance-backend-ewkb.onrender.com; "
+     "connect-src 'self' "
+            "http://127.0.0.1:8000 "
+            "http://localhost:8000 "
+            "https://insurance-backend-ewkb.onrender.com; "
     "frame-ancestors 'none'; "
     "base-uri 'self'; "
     "form-action 'self';"
@@ -255,12 +259,14 @@ def login(response:Response,request:Request,user:schemas.UserLogin,db:Session=De
           "user_id": db_user.id,
           "role": db_user.role
      })
+     is_production = False
      response.set_cookie(
           key="access_token",
             value=token,
             httponly=True,
-            secure=True,
-            samesite="None",
+            secure=is_production    ,
+            samesite="none" if is_production else "lax",
+            max_age=1800,
      )
      return {
           "message": "Login successful",
