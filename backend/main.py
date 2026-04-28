@@ -259,7 +259,7 @@ def login(response:Response,request:Request,user:schemas.UserLogin,db:Session=De
           "user_id": db_user.id,
           "role": db_user.role
      })
-     is_production = True
+     is_production = False
      response.set_cookie(
           key="access_token",
             value=token,
