@@ -25,6 +25,32 @@ Users can securely sign up, log in, and get real-time predictions along with exp
 - 🐳 Dockerized backend deployment on Render
 
 ---
+## ⚙️ Tech Stack
+
+### 🖥️ Frontend
+- HTML
+- CSS
+- JavaScript
+
+### 🔧 Backend
+- FastAPI
+- SQLAlchemy (ORM)
+- Alembic (database migrations)
+
+### 🗄️ Database
+- PostgreSQL (Render hosted)
+
+### 🤖 Machine Learning
+- Linear Regression (Scikit-learn)
+- Log Transformation (for skewed data handling)
+- SHAP (Explainability)
+
+### 🚀 Deployment
+- Backend: Render (Docker)
+- Frontend: Render (Static Site)
+- Database: Render PostgreSQL
+
+---
 ## 📊 Model Selection & Justification
 
 - Performed exploratory data analysis (EDA) to understand feature relationships  
@@ -149,32 +175,6 @@ To ensure observability and track API usage, the application implements a custom
   }
 }
 ```
-## ⚙️ Tech Stack
-
-### 🖥️ Frontend
-- HTML
-- CSS
-- JavaScript
-
-### 🔧 Backend
-- FastAPI
-- SQLAlchemy (ORM)
-- Alembic (database migrations)
-
-### 🗄️ Database
-- PostgreSQL (Render hosted)
-
-### 🤖 Machine Learning
-- Linear Regression (Scikit-learn)
-- Log Transformation (for skewed data handling)
-- SHAP (Explainability)
-
-### 🚀 Deployment
-- Backend: Render (Docker)
-- Frontend: Render (Static Site)
-- Database: Render PostgreSQL
-
----
 
 ## ✨ Features
 
