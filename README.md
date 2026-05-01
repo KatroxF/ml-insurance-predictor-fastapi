@@ -51,6 +51,54 @@ Users can securely sign up, log in, and get real-time predictions along with exp
 - Database: Render PostgreSQL
 
 ---
+## ⚙️ Installation & Setup
+
+Follow these steps to run the project locally:
+
+### 1️⃣ Clone the repository
+
+```bash
+git clone https://github.com/your-username/insurance-project.git
+cd insurance-project
+```
+
+### 2️⃣ Setup Backend
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate   # Windows
+# source venv/bin/activate   # Mac/Linux
+```
+
+### 3️⃣ Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4️⃣ Setup Environment Variables
+
+Create a `.env` file in the backend folder:
+
+```env
+DATABASE_URL=your_postgresql_url
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+### 5️⃣ Run the backend server
+
+```bash
+uvicorn main:app --reload
+```
+
+### 6️⃣ Access API
+
+* Swagger Docs: http://127.0.0.1:8000/docs
+
+
 ## 📊 Model Selection & Justification
 
 - Performed exploratory data analysis (EDA) to understand feature relationships  
