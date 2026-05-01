@@ -98,6 +98,11 @@ uvicorn main:app --reload
 
 * Swagger Docs: http://127.0.0.1:8000/docs
 
+## ⚠️ Demo credentials are for testing purposes only.
+
+### 👤 Admin Access
+- Email: admin@gmail.com  
+- Password: admin123
 
 ## 📊 Model Selection & Justification
 
@@ -265,11 +270,7 @@ https://insurance-backend-ewkb.onrender.com/docs
 ├── alembic.ini
 └── README.md
 ```
-## 🔑 Demo Credentials
 
-### 👤 Admin Access
-- Email: admin@gmail.com  
-- Password: admin123
 
 
 ## 📸 Screenshots
