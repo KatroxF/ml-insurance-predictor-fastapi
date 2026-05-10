@@ -259,13 +259,13 @@ def login(response:Response,request:Request,user:schemas.UserLogin,db:Session=De
           "user_id": db_user.id,
           "role": db_user.role
      })
-     is_production = False
+     is_production = True
      response.set_cookie(
           key="access_token",
             value=token,
             httponly=True,
-            secure=is_production    ,
-            samesite="none" if is_production else "lax",
+            secure=is_production,
+            samesite="none" if is_production else "lax",   #none for cross site #lax for local testing
             max_age=1800,
      )
      return {
