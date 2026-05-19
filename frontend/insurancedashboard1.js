@@ -25,6 +25,18 @@ async function guardAuth() {
     window.location.href = "login.html";
   }
 }
+async function handleLogout() {
+  try {
+    await fetch(`${API_BASE}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch {
+    // Even if the request fails, redirect anyway
+  } finally {
+    window.location.href = "login.html";
+  }
+}
 
 
 const usersState = {
